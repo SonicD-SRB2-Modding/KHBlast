@@ -1,0 +1,228 @@
+MainCfg
+GameData = KHBlast.dat
+MaxXtraLife = 0
+CustomVersion = KHBlast RC 2
+NumDemos = 0
+SPStage_Start = ZZ
+
+Level 3
+Levelname = Greenflower
+Act = 3
+Music = VSBOSS
+MusicPostBoss = GFZ1
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 4
+SkyNum = 1
+RecordAttack = true
+LevelSelect = 1
+SkyboxScale = 64
+BonusType = Boss
+FlickyList = Bluebird,Chipmunk
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 5
+
+Emblem 15
+Type = Time
+Var = 120*TICRATE
+MapNum = 3
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 6
+Levelname = Techno Hill
+Act = 3
+Music = VSBOSS
+MusicPostBoss = THZ2
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 7
+SkyNum = 4
+RecordAttack = true
+LevelSelect = 1
+BonusType = Boss
+FlickyList = Rabbit,Chicken
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 8
+
+Emblem 31
+Type = Time
+Var = 180*TICRATE
+MapNum = 6
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 9
+Levelname = Deep Sea
+Act = 3
+Music = VSBOSS
+MusicPostBoss = DSZ1
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 10
+SkyNum = 8
+RecordAttack = true
+LevelSelect = 1
+SkyboxScale = 32
+BonusType = Boss
+FlickyList = Fish,Fish,Seal
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 12
+
+Emblem 47
+Type = Time
+Var = 180*TICRATE
+MapNum = 9
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 12
+Levelname = Castle Eggman
+Act = 3
+Music = VSBOSS
+MusicPostBoss = CEZ2
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 13
+Weather = 1
+SkyNum = 10
+RecordAttack = true
+LevelSelect = 1
+BonusType = Boss
+FlickyList = Rat,Bear
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 15
+
+Emblem 63
+Type = Time
+Var = 240*TICRATE
+MapNum = 12
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 15
+Levelname = Arid Canyon
+Act = 3
+Music = VSFANG
+MusicPostBoss = ACZ1
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 16
+SkyNum = 15
+SkyboxScale = 16
+RecordAttack = true
+LevelSelect = 1
+FlickyList = Canary,Ram
+BonusType = Boss
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 18
+
+Emblem 79
+Type = Time
+Var = 240*TICRATE
+MapNum = 15
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 26
+Levelname = Black Core
+Act = 2
+Music = VSMETL
+MusicPostBoss = BCZ2
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = 27
+SkyNum = 22
+RecordAttack = true
+LevelSelect = 1
+BonusType = Boss
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 21
+
+Emblem 104
+Type = Time
+Var = 180*TICRATE
+MapNum = 26
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 27
+Levelname = Black Core
+Act = 3
+Music = VSBRAK
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = ENDING
+SkyNum = 22
+RecordAttack = true
+LevelSelect = 1
+BonusType = None
+SkyboxScale = 64
+StartRings = 0
+ForceResetMusic = On
+WarningTitle = true
+LUA.RALevel = 21
+LUA.superboss = 1
+
+Emblem 106
+Type = Time
+Var = 180*TICRATE
+MapNum = 27
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Level 28
+Levelname = True Black Core
+Act = 0
+SubTitle = ~Super Attack~
+Music = VSBRAK
+TypeOfLevel = Singleplayer,Co-op
+NextLevel = ENDING
+SkyNum = 22
+RecordAttack = true
+LevelSelect = 1
+NoVisitNeeded = true
+Unlockable = 12
+BonusType = None
+SkyboxScale = 64
+StartRings = 0
+SelectHeading = Super Attack
+ForceResetMusic = On
+WarningTitle = true
+WideIcon = true
+LUA.RALevel = 21
+LUA.superboss = 2
+
+Emblem
+Type = Time
+Var = 120*TICRATE
+MapNum = 28
+Sprite = T
+Color = SKINCOLOR_GREY
+
+Emblem
+Type = Score
+Var = 50000
+MapNum = 28
+Sprite = S
+Color = SKINCOLOR_BROWN
+
+Level ZZ
+Levelname = The Station
+SubTitle = Difficulty Select
+SelectHeading = Stations of Awakening
+NoZone = true
+LevelSelect = 1
+Act = 0
+Music = SPEC8
+TypeOfLevel = Singleplayer,Co-op
+HideInStats = true
+SkyNum = 99
+NextLevel = 1
+BonusType = None
+WideIcon = true

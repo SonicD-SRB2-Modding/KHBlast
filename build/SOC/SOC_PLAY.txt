@@ -1,0 +1,140 @@
+Character 0
+Status = 0
+
+Character 1
+Status = 0
+
+Character 2
+Status = 0
+
+Character 3
+Status = 0
+
+Character 4
+Status = 0
+
+Character 5
+Status = 0
+
+Character 6
+Status = 0
+
+Character 0
+Status = 1
+SkinName = sonic&tails
+PicName = CHRS&T
+DisplayName = Sonic#& Tails
+TagTextColor = SKINCOLOR_BLUE
+TagOutlineColor = SKINCOLOR_YELLOW
+OppositeColor = SKINCOLOR_SKY
+PlayerText = ^4Sonic^0 & ^7Tails^0, working together to stop Dr. Ivo 'Eggman' Robotnic's latest scheme!
+
+Starting Stats:
+^3HP:^0 ^422^0 / ^715^0
+^4RP:^0 ^44^0 / ^74^0
+^5STR:^0 ^44^0 / ^73^0
+^4MAG:^0 ^44^0 / ^76^0
+^2Drive:^0 ^4Super Sonic^0 & ^7Super Tails^0
+
+Tip: ^7Tails^0 has an unlimited number of Auto-Lifes, so don't worry about losing him!
+#
+
+Character 1
+Status = 1
+SkinName = sonic
+DisplayName = Sonic
+PlayerText = ^4Sonic^0 is average at most skills, but excells with his speed and Homing Thok.
+
+Starting Stats:
+^3HP:^0 22
+^4RP:^0 4
+^5STR:^0 4
+^4MAG:^0 4
+^2Drive:^0 Super Sonic
+
+Tip: Loose ^2Rings^0 will both fill your ^4Ring Power^0 and ^2Drive^0 gauges when collected. Rings in Item Boxes only boost the ^2Drive^0 gauge.
+#
+
+Character 2
+Status = 1
+SkinName = tails
+DisplayName = Tails
+TagTextColor = SKINCOLOR_YELLOW
+TagOutlineColor = SKINCOLOR_BLUE
+PlayerText = ^7Tails^0 not only can fly, but is an expert at using ^4Magic^0.
+
+Starting Stats:
+^3HP:^0 15
+^4RP:^0 4
+^5STR:^0 3
+^4MAG:^0 6
+^2Drive:^0 Super Tails
+
+Tip: Gain enough XP, and your max ^3HP^0 and/or ^4RP^0 will increase. If your max ^3HP^0 increases, you will also be healed up!
+#
+
+Character 3
+Status = 1
+SkinName = knuckles
+DisplayName = Knuckles
+PlayerText = ^5Knuckles^0 is great up close, but is bad with ^4Magic^0.
+
+Starting Stats:
+^3HP:^0 30
+^4RP:^0 1
+^5STR:^0 6
+^4MAG:^0 1
+^2Drive:^0 Hyper Knuckles
+
+Tip: While ^5Knuckles^0 can take more hits than most others, he's still as vunurable to instant kill traps as they are.
+#
+
+Character 4
+SkinName = amy
+DisplayName = Amy Rose
+TagOutlineColor = SKINCOLOR_YELLOW
+Status = 2
+PlayerText = ^1Amy^0's hammer and ^4Magic^0 skills makes up for her weaknesses.
+
+Starting Stats:
+^3HP:^0 16
+^4RP:^0 5
+^5STR:^0 3
+^4MAG:^0 5
+^2Drive:^0 Super Amy
+
+Tip: ^1Amy^0's hammer can grant Pity Shields to her allies, protecting them from one single attack!
+#
+
+Character 5
+SkinName = fang
+DisplayName = Fang
+TagOutlineColor = SKINCOLOR_WHITE
+Status = 2
+PlayerText = ^9Fang^0 prefers using his Popgun over ^4Magic^0 when fighting at range.
+
+Starting Stats:
+^3HP:^0 10
+^4RP:^0 2
+^5STR:^0 4
+^4MAG:^0 2
+^2Drive:^0 Hyper Fang
+
+Tip: Not everyone will gain new ^4Ring Power^0 units at the same rate. Some, like ^9Fang^0, can't get any upgrades for it from bosses!
+#
+
+Character 6
+SkinName = metalsonic
+DisplayName = Metal#Sonic
+Status = 2
+PlayerText = ^4Metal Sonic^0 is almost like Sonic, but with more health and less ^4Magic^0 potential.
+
+Starting Stats:
+^3HP:^0 25
+^4RP:^0 0
+^5STR:^0 4
+^4MAG:^0 2
+^2Drive:^0 Super Metal Sonic
+
+Tip: ^4Metal Sonic^0 requires Chaos Emeralds to use ^4Ring Power^0. They can't gain ^4RP^0 any other way.
+#
