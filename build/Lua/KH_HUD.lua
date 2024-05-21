@@ -64,6 +64,33 @@ local function getshieldskin(p)
 	
 end
 
+//drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, false)
+local function	drawMPBar(v, p, length, fillpercent, sx, sy, flags, party, recharge)
+	local colormap = v.getColormap("sonic", SKINCOLOR_BLUE)
+	local lastcolormap = v.getColormap("sonic", SKINCOLOR_GREY)
+	local chargecolormap = v.getColormap("sonic", SKINCOLOR_AQUA)
+	local y = sy*FRACUNIT
+	if party then y = $ - (FRACUNIT/2) end
+	if fillpercent <= 0 then
+		v.drawStretched(sx*FRACUNIT, y, (length*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, lastcolormap)
+	else
+		v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
+		if fillpercent < length then
+			v.drawStretched((sx*FRACUNIT)-((fillpercent*FRACUNIT)/2), y, (length*(FRACUNIT/2))-(fillpercent*(FRACUNIT/2)), FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, lastcolormap)
+		end
+	end
+	
+	if party then
+		v.draw(sx, sy-1, v.cachePatch("KSB_ENN"), flags, colormap)
+		v.drawStretched((sx*FRACUNIT)-((length-2)*(FRACUNIT/2)), (sy-1)*FRACUNIT, (length-4)*(FRACUNIT/2), FRACUNIT,  v.cachePatch("KSB_MDN"), flags, colormap)
+		v.drawStretched((sx*FRACUNIT)-((length+4)*(FRACUNIT/2)), (sy-1)*FRACUNIT, FRACUNIT, FRACUNIT, v.cachePatch("KSB_STN"), flags, colormap)
+	else
+		v.draw(sx+15, sy-1, v.cachePatch("KMP_END"), flags, colormap)
+		v.drawStretched((sx*FRACUNIT)-((length-2)*(FRACUNIT/2)), (sy-1)*FRACUNIT, (length-4)*(FRACUNIT/2), FRACUNIT,  v.cachePatch("KHP_MID"), flags, colormap)
+		v.drawStretched((sx*FRACUNIT)-((length+4)*(FRACUNIT/2)), (sy-1)*FRACUNIT, FRACUNIT, FRACUNIT, v.cachePatch("KHP_STA"), flags, colormap)
+	end
+end
+
 local function drawHPBar(v, p, length, tier, fillpercent, sx, sy, flags, party)
 	local lasttier = min(max(tier - 1, 0), 7)
 	local colormap
@@ -421,15 +448,13 @@ local function drawPartyHPHUD(v, p, x, y)
 				hpBarPercent = 100
 			end
 		end
-		local healthbarredpercent = hpBarPercent + (p.kh.lasthp -  p.hp)
-		if hpBarState == MAXHPBARS then healthbarredpercent = 100 end
 		if hudpatch then //This draws the player icon
 			if p.powers[pw_super] and hudpatch[5] then
 				v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[5]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 			elseif hudpatch[4] and p.hp <= 0 then
-			`v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[4]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
+				v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[4]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 			elseif hudpatch[3] and p.recentdamaged then
-			`v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[3]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
+				v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[3]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 			elseif hudpatch[2] and (p.hp * 5) <= p.maxHP then
 				v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[2]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 			else
@@ -438,6 +463,11 @@ local function drawPartyHPHUD(v, p, x, y)
 		end
 		if hpBarPercent == 0 and p.hp then hpBarPercent = 1 end
 		drawHPBar(v, p, hpBarLength, hpBarState, hpBarPercent, x-8, y+2, playerhealthflags, true)
+		if p.maxMP then
+			local mpBarLength = p.maxMP
+			local mpBarPercent = max(p.mp, 0)
+			drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true)
+		end
 	else
 		if hudpatch then //This draws the player icon
 			if p.powers[pw_super] and hudpatch[5] then
@@ -475,8 +505,6 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 						hpBarPercent = $ - 100
 					end
 				end
-				local healthbarredpercent = hpBarPercent + (p.kh.lasthp -  p.hp)
-				if hpBarState == MAXHPBARS then healthbarredpercent = 100 end
 				if hpBarPercent == 0 and p.hp then hpBarPercent = 1 end
 				if hudpatch then //This draws the player icon
 					if p.powers[pw_super] and hudpatch[5] then
@@ -500,6 +528,11 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 						v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[1]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 					end
 				end
+			end
+			if p.maxMP then
+				local mpBarLength = p.maxMP
+				local mpBarPercent = max(p.mp, 0)
+				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false)
 			end
 			//Draw the player's Drive Bar
 			if not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) then drawKHDriveBar(v, p, x-31, y-8) end
@@ -572,7 +605,8 @@ hud.add(function(v, player)
 							timerstring = $ .. "." .. string.format("%02d", G_TicsToCentiseconds(time))
 						end
 					end
-					v.drawString(2, py - 88, "\x82".."TIME: ".."\x80"..timerstring, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS|(redtime and V_REDMAP or 0), "small")
+					v.drawString(2, py - 88, "\x82".."TIME:   ".."\x80"..timerstring, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS|(redtime and V_REDMAP or 0), "small")
+					v.drawString(2, py - 78, "\x82".."SCORE: ".."\x80"..p.score, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS, "small")
 				end
 			end
 		else
@@ -618,7 +652,8 @@ hud.add(function(v, player)
 							timerstring = $ .. "." .. string.format("%02d", G_TicsToCentiseconds(time))
 						end
 					end
-					v.drawString(4, 4, "\x82".."TIME: ".."\x80"..timerstring, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS|(redtime and V_REDMAP or 0))
+					v.drawString(4, 04, "\x82".."TIME:   ".."\x80"..timerstring, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS|(redtime and V_REDMAP or 0))
+					v.drawString(4, 14, "\x82".."SCORE: ".."\x80"..p.score, V_SNAPTOTOP|V_SNAPTOLEFT|V_HUDTRANS)
 				end
 				if tutorialmode then
 					drawKHHPHud(v, p, p, x, y+40, nil, nil, 0, false)
@@ -627,7 +662,7 @@ hud.add(function(v, player)
 				else
 					drawKHHPHud(v, p, p, x, y+92, nil, nil, 0, false)
 				end
-				if p.kh.target then
+				if p.kh and p.kh.target then
 					local up = drawKHFoeHealthNew(v, p, 318, 8)
 					if up > 0 then
 						drawKHInfoBar(v, p, 320, 32)
