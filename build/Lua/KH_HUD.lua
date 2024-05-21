@@ -3,13 +3,13 @@
 rawset(_G, "khheadpatch", setmetatable({
 	//Each character will have (up to) five HUD sprites, in this order:
 	//Normal, Low Health, KOed, Damaged, Super and Unique
-	//KH_CHARA, KL_CHARA, KK_CHARA, KD_CHARA, KS_CHARA, KU_CHARA
-	["sonic"] = {"KH_SONIC", "KL_SONIC"},
-	["tails"] = {"KH_TAILS", "KL_TAILS"},
-	["knuckles"] = {"KH_KNUX", "KL_KNUX"},
-	["amy"] = {"KH_AMY", "KL_AMY"},
-	["fang"] = {"KH_FANG", "KL_FANG"},
-	["metalsonic"] = {"KH_METAL", "KL_METAL"}
+	//KCH_CHARA, KCL_CHARA, KCK_CHARA, KCD_CHARA, KCS_CHARA, KCU_CHARA
+	["sonic"] = {"KCH_SONIC", "KCL_SONIC"},
+	["tails"] = {"KCH_TAILS", "KCL_TAILS"},
+	["knuckles"] = {"KCH_KNUX", "KCL_KNUX"},
+	["amy"] = {"KCH_AMY", "KCL_AMY"},
+	["fang"] = {"KCH_FANG", "KCL_FANG"},
+	["metalsonic"] = {"KCH_METAL", "KCL_METAL"}
 }, {__index = function() return {"KH_BASE"} end}))
 
 local hpbarskin = {
@@ -64,7 +64,6 @@ local function getshieldskin(p)
 	
 end
 
-//drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, false)
 local function	drawMPBar(v, p, length, fillpercent, sx, sy, flags, party, recharge)
 	local colormap = v.getColormap("sonic", SKINCOLOR_BLUE)
 	local lastcolormap = v.getColormap("sonic", SKINCOLOR_GREY)
@@ -463,11 +462,6 @@ local function drawPartyHPHUD(v, p, x, y)
 		end
 		if hpBarPercent == 0 and p.hp then hpBarPercent = 1 end
 		drawHPBar(v, p, hpBarLength, hpBarState, hpBarPercent, x-8, y+2, playerhealthflags, true)
-		if p.maxMP then
-			local mpBarLength = p.maxMP
-			local mpBarPercent = max(p.mp, 0)
-			drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true)
-		end
 	else
 		if hudpatch then //This draws the player icon
 			if p.powers[pw_super] and hudpatch[5] then
@@ -476,6 +470,15 @@ local function drawPartyHPHUD(v, p, x, y)
 				v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT/2, v.cachePatch(hudpatch[1]), playerhealthflags, v.getColormap(p.mo.skin, p.mo.color))
 			end
 		end
+	end
+	if p.maxMP then
+		local mpBarLength = (p.maxMP / 2) + (p.maxMP % 2)
+		local mpBarPercent = max(p.mp / 2, 0) + (p.mp % 2)
+		if mpBarLength > 50 then
+			mpBarPercent = ($ * 50) / mpBarLength
+			mpBarLength = 50
+		end
+		drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true)
 	end
 end
 
@@ -529,9 +532,15 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 					end
 				end
 			end
+			
+			//Draw the player's MP Bar
 			if p.maxMP then
 				local mpBarLength = p.maxMP
 				local mpBarPercent = max(p.mp, 0)
+				if mpBarLength > 100 then
+					mpBarPercent = ($ * 100) / mpBarLength
+					mpBarLength = 100
+				end
 				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false)
 			end
 			//Draw the player's Drive Bar
