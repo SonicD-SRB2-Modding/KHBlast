@@ -18,6 +18,9 @@ local function aeroShieldUpdater(oldVal) //Returns new shield state, and if the 
 		newVal = SH_ELEMENTAL //Change Flame and Bubble to Elemental
 	elseif (oldVarElse == SH_ATTRACT) then
 		newVal = SH_THUNDERCOIN //Change Attract to Thundercoin
+	elseif (oldVarElse & SH_FORCE)
+		if (oldVarElse & SH_FORCEHP) then return oldVal, false //If a Force Shield has more than 1HP, ignore
+		else newVal = (oldVarElse | 1) end //Else restore it to 2HP
 	end
 	newVal = $ | oldValStack //Reapply the Fire Flower if needed
 	return newVal, true
