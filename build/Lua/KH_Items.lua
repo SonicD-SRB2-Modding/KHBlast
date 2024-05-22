@@ -171,4 +171,4 @@ rawset(_G, "khItemList", {
 		PercentHeal = false, //Ignored for One Ups
 		HealVal = 1 //Also ignored as they only add 1 Extra Life
 	}
-}
+})

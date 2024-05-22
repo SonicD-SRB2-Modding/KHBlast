@@ -17,10 +17,12 @@ local basexp = 20
 local totalxp = basexp
 rawset(_G, "needEXP", {})
 
-for i = 1, 100
+needEXP[0] = 0
+for i = 1, 98
 	needEXP[i] = totalxp
 	totalxp = ($1 + (basexp*i)*38/100)
 end
+needEXP[99] = -1 //99 is max level
 
 rawset(_G, "khBlastDiffTable", {
 	//Difficulty Text, Foe Damage Mod (2 = 100%), maxHP Mod (4 = 100%), description, expZero

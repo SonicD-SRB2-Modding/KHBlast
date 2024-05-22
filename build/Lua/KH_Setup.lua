@@ -20,6 +20,26 @@ rawset(_G, "getEmeraldCount", function(flags)
 	return numEmeralds
 end)
 
+rawset (_G, "setupKHStuff", function(p)
+	if not p.kh then
+		p.kh = {
+			itemlist = {},
+			commandlist = {},
+			lastWpn = 0,
+			lastMagic = 1,
+			cOption = 1,
+			comButton = false,
+			lastOption = 1,
+			menuMode = 0,
+			xp = 0,
+			level = 1
+		}
+		p.lives = 1
+		return true //Just set them up
+	end
+	return false //Already set up
+end)
+
 COM_AddCommand("changeKHDiffMarathon", function(player, newDiff)
 	if newDiff == nil
 		CONS_Printf(player, "This command allows you to set the difficulty level as the default for marathons.")
@@ -58,6 +78,8 @@ addHook("ThinkFrame", function()
 			p.maxHP = data.StartingHP
 			p.mp = data.StartingMP
 			p.maxMP = data.StartingMP
+			p.mpRecharge = 0
+			print(setupKHStuff(p))
 		end
 	end
 end)

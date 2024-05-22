@@ -554,6 +554,158 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 	end
 end
 
+local function drawKHXPBar (v, p, x, y)
+	if not p.mo then return end
+	local xp = 0
+	local level = 1
+	if p.kh and p.kh.xp then 
+		xp = p.kh.xp
+		if p.kh.level then level = min(p.kh.level, 99) end
+	end
+	local toNextLevel = (xp - needEXP[level-1])
+	local levelxp = needEXP[level] - needEXP[level-1]
+	local xppercent = (toNextLevel * 100) / levelxp
+	if level == 99 then 
+		toNextLevel = -1
+		levelxp = 1
+		xppercent = 100
+	end
+	if khBlastDiffTable[khBlastDiff][5] then 
+		xp = 0 
+		level = 1
+		toNextLevel = -1
+		levelxp = 1
+		xppercent = 0
+	end
+	
+	if not splitscreen then
+		v.drawStretched(((x+2)*FRACUNIT), (y+1)*FRACUNIT, (xppercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_CYAN))
+		if khBlastDiffTable[khBlastDiff][5] then
+			v.drawStretched((x+2)*FRACUNIT, (y+1)*FRACUNIT, (100*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_CARBON))
+		else
+			v.drawStretched(((x+2)*FRACUNIT)+((xppercent*FRACUNIT)/2), (y+1)*FRACUNIT, ((100-xppercent)*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_GREY))
+		end
+		v.draw(x, y, v.cachePatch("KXP_BAR"), playerhudflags)
+		if not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) then
+			if modeattacking then
+				v.drawString(x+4, y+1, "\x82".."SCORE: ".."\x88"..tostring(p.score), playerhudflags, "small")
+				v.drawString(x, y-6, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(level)).."\x80 - ".."\x82".."RINGS: ".."\x88"..tostring(p.rings), playerhudflags, "small")
+			elseif not (G_GametypeUsesLives() or G_IsSpecialStage() or (gametype == GT_RACE)) then
+				local ringsstring = "\x82".."RINGS: ".."\x88"..tostring(p.rings)
+				if p.currentweapon then
+					ringsstring = $.." ("..p.powers[pw_infinityring + p.currentweapon]..")"
+				elseif p.powers[pw_infinityring] then
+					ringsstring = "\x82".."RINGS: ".."\x85"..tostring(p.rings + p.powers[pw_infinityring])
+				end
+				v.drawString(x, y-6, ringsstring, playerhudflags, "small")
+				v.drawString(x+4, y+1, "\x82".."LV: ".."\x88"..tostring(level), playerhudflags, "small")
+			elseif (not khBlastDiffTable[khBlastDiff][5]) then
+				v.drawString(x, y-6, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(level)).."\x80 - ".."\x82".."XP: ".."\x88"..tostring(xp), playerhudflags, "small")
+				if level == 99 then
+					v.drawString(x+4, y+1, "\x82".."TNL: ".."\x88".."MAX", playerhudflags, "small")
+				else
+					v.drawString(x+4, y+1, "\x82".."TNL: ".."\x88"..tostring(levelxp-toNextLevel), playerhudflags, "small")
+				end
+			else
+				v.drawString(x, y-6, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(1)), playerhudflags, "small")
+			end
+		end
+	
+	else
+		local xpPercentText = "\x82".."TNL: ".."\x88"..tostring(xppercent).."%"
+		if level == 99 then  xpPercentText = "\x82".."TNL: ".."\x88".."MAX" end
+		if not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) and not (G_GametypeUsesLives() or G_IsSpecialStage() or (gametype == GT_RACE)) then
+			local ringsstring = "\x82".."RINGS: ".."\x88"..tostring(p.rings)
+			if p.currentweapon then
+				ringsstring = $.." ("..p.powers[pw_infinityring + p.currentweapon]..")"
+			elseif p.powers[pw_infinityring] then
+				ringsstring = "\x82".."RINGS: ".."\x85"..tostring(p.rings + p.powers[pw_infinityring])
+			end
+			v.drawString(x, y, ringsstring, playerhudflags, "small")
+			v.drawString(x, y+5, "\x82".."LV: ".."\x88"..tostring(level).."\x80 - "..xpPercentText, playerhudflags, "small")
+		elseif (not khBlastDiffTable[khBlastDiff][5]) then
+			v.drawString(x, y, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(level)).."\x80 - ".."\x82".."XP: ".."\x88"..tostring(xp), playerhudflags, "small")
+			if level == 99 then
+				v.drawString(x, y+5, "\x82".."TNL: ".."\x88".."MAX", playerhudflags, "small")
+			else
+				v.drawString(x, y+5, "\x82".."TNL: ".."\x88"..tostring(levelxp-toNextLevel).. " ("..tostring(xppercent).."%)", playerhudflags, "small")
+			end
+		else
+			v.drawString(x, y, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(1)), playerhudflags, "small")
+		end
+	end
+end
+
+local function drawCommandMenu(v, p, x, y)
+	if not p.kh then return end
+	local colormap = p.skincolor
+	if (mapheaderinfo[gamemap].levelflags & LF_WARNINGTITLE) or ultimatemode then colormap = SKINCOLOR_RED end
+	if not splitscreen then
+		v.drawScaled(x*FRACUNIT, y*FRACUNIT, (3*FRACUNIT)/4, v.cachePatch("KH_CMDS"), playerhudflags, v.getColormap("sonic", colormap))
+	else
+		v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT / 2, v.cachePatch("KH_CMDL"), playerhudflags, v.getColormap("sonic", colormap))
+	end
+	local priorslot
+	local currentslot
+	local nextslot
+	local headername = "KH_CMD"
+	if not splitscreen then headername = "KH_CDS" end
+	local headerpatch = v.cachePatch(headername.."R")
+	
+	priorslot, currentslot, nextslot = createMenu(p)
+	if p.kh.menuMode == 0 then //Magic
+		if (mapheaderinfo[gamemap].levelflags & LF_WARNINGTITLE) or ultimatemode then
+			headerpatch = v.cachePatch(headername.."MB")
+		else
+			headerpatch = v.cachePatch(headername.."M")
+		end
+	elseif p.kh.menuMode == 1 then
+		if (mapheaderinfo[gamemap].levelflags & LF_WARNINGTITLE) or ultimatemode then
+			headerpatch = v.cachePatch(headername.."IB")
+		else
+			headerpatch = v.cachePatch(headername.."I")
+		end
+	end
+	
+	local bottomstring
+	if G_GametypeUsesLives() then
+		if ultimatemode then
+			bottomstring = "\x85".."ULTIMATE"
+		else
+			bottomstring = "\x82".."A.Life".."\x80".." x ".."\x82"..string.format("%02d",tostring(min(max(p.lives - 1, 0),99)))
+		end
+	elseif p.kh.menuMode == 2 then
+		bottomstring = getLastSpell(p)
+	else
+		bottomstring = khRingList[p.currentweapon]
+		if p.currentweapon == 0 and p.powers[pw_infinityring] then bottomstring	 = "INFINITY" end
+	end
+	
+	if not splitscreen then
+		v.drawScaled(x*FRACUNIT, y*FRACUNIT,  (3*FRACUNIT)/4, headerpatch,  playerhudflags)
+		
+		//Top
+		v.drawString(x+6,y-24, priorslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+		//Middle
+		v.drawString(x+6,y-15, currentslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+		//Bottom
+		v.drawString(x+6,y-6, nextslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+	
+		v.drawString(x+6,y+3, bottomstring, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+	else
+		v.drawScaled(x*FRACUNIT, y*FRACUNIT, FRACUNIT / 2, headerpatch,  playerhudflags)
+		
+		//Top
+		v.drawString(x+4,y-17, priorslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+		//Middle
+		v.drawString(x+4,y-11, currentslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+		//Bottom
+		v.drawString(x+4,y-5, nextslot, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+	
+		v.drawString(x+4,y+1, bottomstring, V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+	end
+end
+
 hud.add(function(v, player)
 	if rawget(_G, "warioHUD") then
 		warioHUD = false
@@ -583,7 +735,7 @@ hud.add(function(v, player)
 				drawKHHPHud(v, p, p, x, y+92, displayplayer, secondarydisplayplayer, nil, true)
 				local py = y
 				if (p == secondarydisplayplayer) then py = $ + 100 end
-				//drawKHXPBar(v, p, 2, py)
+				drawKHXPBar(v, p, 2, py)
 				if p.kh.target then
 					drawKHFoeHealthNew(v, p, 318, py - 84)
 					drawKHInfoBar(v, p, 320, py - 68)
@@ -627,17 +779,17 @@ hud.add(function(v, player)
 			
 			if p == player then
 				if (modeattacking and not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS)) then
-					//drawKHXPBar(v, p, 2, 150)
+					drawKHXPBar(v, p, 2, 150)
 				elseif not tutorialmode then
-					//drawKHXPBar(v, p, 2, 190)
+					drawKHXPBar(v, p, 2, 190)
 				end
 				if not ((mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) or G_IsSpecialStage()) then
 					if tutorialmode then
-						//drawCommandMenu(v, p, 2, 136)
+						drawCommandMenu(v, p, 2, 136)
 					elseif modeattacking then
-						//drawCommandMenu(v, p, 2, 134)
+						drawCommandMenu(v, p, 2, 134)
 					else
-						//drawCommandMenu(v, p, 2, 174)
+						drawCommandMenu(v, p, 2, 174)
 					end
 					local redtime = false
 					local time = p.realtime
