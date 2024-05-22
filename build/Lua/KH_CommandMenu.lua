@@ -82,13 +82,11 @@ rawset(_G, "getLastSpell", function(p)
 end)
 
 rawset(_G, "createMenu", function(p) //Returns the items that should be in the three menu slots - prior, current and next
-	local switch
-	if p.kh and p.kh.menuMode then switch = p.kh.menuMode else switch = 2 end
-	
-	local cPrior = -1
+	local cPrior = 0
 	if p.kh and p.kh.cOption then
 		cPrior = p.kh.cOption - 1
-		if (p.kh.menuMode == 0) and (cPrior < 1) then cPrior = #p.kh.commandlist 
+		if (p.kh.menuMode == 0) and (cPrior < 1) then
+			if (#p.kh.commandlist > 1) then cPrior = #p.kh.commandlist else cPrior = 0 end
 		elseif (p.kh.menuMode == 1) and (cPrior < 1) then 
 			if #p.kh.itemlist > 1 then cPrior = #p.kh.itemlist else cPrior = 0 end
 		elseif (p.kh.menuMode == 2) and (cPrior < 0) then cPrior = WEP_RAIL
@@ -98,17 +96,18 @@ rawset(_G, "createMenu", function(p) //Returns the items that should be in the t
 	local cOption = 1
 	if p.kh.cOption then cOption = p.kh.cOption end
 	
-	local cNext = -1
+	local cNext = 0
 	if p.kh and p.kh.cOption then
 		cNext = p.kh.cOption + 1
-		if (p.kh.menuMode == 0) and (cNext > #p.kh.commandlist) then cNext = 1 
+		if (p.kh.menuMode == 0) and (cNext > #p.kh.commandlist) then 
+			if (#p.kh.commandlist > 1) then cNext = 1 else cNext = 0 end
 		elseif (p.kh.menuMode == 1) and (cNext > #p.kh.itemlist) then 
 			if #p.kh.itemlist > 1 then cNext = 1 else cNext = 0 end
 		elseif (p.kh.menuMode == 2) and (cNext == NUM_WEAPONS) then cNext = 0
 		end
 	end
 	
-	if switch == MENU_MAGIC then //Magic Menu
+	if p.kh.menuMode == MENU_MAGIC then //Magic Menu
 		if p.kh and p.kh.cOption then
 			local commands = p.kh.commandlist
 			if #commands == 0 then
@@ -147,7 +146,7 @@ rawset(_G, "createMenu", function(p) //Returns the items that should be in the t
 		else
 			return "", "\x86".."-", ""
 		end
-	elseif switch == MENU_ITEMS then //Item Menu
+	elseif p.kh.menuMode == MENU_ITEMS then //Item Menu
 		if p.kh and p.kh.cOption then
 			local commands = p.kh.itemlist
 			if #commands == 0 then
@@ -166,7 +165,7 @@ rawset(_G, "createMenu", function(p) //Returns the items that should be in the t
 		else
 			return "", "\x86".."-", ""
 		end
-	elseif switch == MENU_RINGS then //Rings Menu
+	elseif p.kh.menuMode == MENU_RINGS then //Rings Menu
 		local priorslot = "\x86"..khRingList[cPrior]
 		local currentslot = khRingList[cOption]
 		if cOption == 0 and p.powers[pw_infinityring] then currentslot = "INFINITY" end

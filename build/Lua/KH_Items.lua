@@ -96,7 +96,7 @@ rawset(_G, "khItemList", {
 		CName = "Elixer",
 		Description = "Heals 50% HP and 50% MP",
 		Type = ITEMT_ELIXER,
-		PercentHeal = true,
+		PercentHeal = true, //Ignored for Elixers
 		HealVal = 50
 	},
 	["MegaElixer"] = {
@@ -104,7 +104,7 @@ rawset(_G, "khItemList", {
 		CName = "M.Elixer",
 		Description = "Heals all HP and MP",
 		Type = ITEMT_ELIXER,
-		PercentHeal = true,
+		PercentHeal = true, //Ignored for Elixers
 		HealVal = 100
 	},
 	["PartyElixer"] = {
@@ -112,7 +112,7 @@ rawset(_G, "khItemList", {
 		CName = "P.Elixer",
 		Description = "Heals all HP and MP for all party members",
 		Type = ITEMT_GELIXER,
-		PercentHeal = true,
+		PercentHeal = true, //Ignored for Elixers
 		HealVal = 100
 	},
 	["DriveChargerI"] = {
@@ -172,3 +172,136 @@ rawset(_G, "khItemList", {
 		HealVal = 1 //Also ignored as they only add 1 Extra Life
 	}
 })
+
+rawset(_G, "useKHItem", function(p, item)
+	local itemData = khItemList[item]
+	if not itemData then return false end
+	local itemType = itemData.Type
+	local isHealed = false
+	if itemType == ITEMT_AUTOLIFE then
+		p.lives = $ + 1
+		P_PlayLivesJingle(p)
+		return true
+	elseif itemType == ITEMT_REVIVE then
+		return false //Not coded in yet
+	elseif itemType == ITEMT_DRIVE then
+		p.rings = $ + itemData.HealVal
+		return true
+	elseif (itemType == ITEMT_POTION) or (itemType == ITEMT_GPOTION) then
+		if p.hp < p.maxHP then //Heal HP
+			if itemData.PercentHeal then
+				p.hp = min(p.maxHP, $ + ((itemData.HealVal * 100) / maxHP))
+			else
+				p.hp = min(p.maxHP, $ + itemData.HealVal)
+			end
+			isHealed = true
+		end
+		if itemType == ITEMT_GPOTION then
+			for play in players.iterate do
+				if play == p then continue end
+				if play.hp == 0 then continue end
+				if play.hp < play.maxHP then //Heal HP
+					if itemData.PercentHeal then
+						play.hp = min(play.maxHP, $ + ((itemData.HealVal * 100) / maxHP))
+					else
+						play.hp = min(play.maxHP, $ + itemData.HealVal)
+					end
+					isHealed = true
+				end
+			end
+		end
+	elseif (itemType == ITEMT_ETHER) or (itemType == ITEMT_GETHER) then
+		if p.mp == 0 then //Mana Recharge
+			if itemData.PercentHeal then
+				p.mpRecharge = min(p.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+			else
+				p.mpRecharge = min(p.maxMP, $ + itemData.HealVal)
+			end
+			if p.mpRecharge >= p.maxMP then //MP fully recharged
+				p.mp = p.maxMP
+				p.mpRecharge = 0
+			end
+			isHealed = true
+		elseif p.mp < p.maxMP then //Heal MP
+			if itemData.PercentHeal then
+				p.mp = min(p.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+			else
+				p.mp = min(p.maxMP, $ + itemData.HealVal)
+			end
+			isHealed = true
+		end
+		if itemType == ITEMT_GETHER then
+			for play in players.iterate do
+				if play == p then continue end
+				if play.hp == 0 then continue end
+				if play.mp == 0 then //Mana Recharge
+					if itemData.PercentHeal then
+						play.mpRecharge = min(play.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+					else
+						play.mpRecharge = min(play.maxMP, $ + itemData.HealVal)
+					end
+					if play.mpRecharge >= play.maxMP then //MP fully recharged
+						play.mp = play.maxMP
+						play.mpRecharge = 0
+					end
+					isHealed = true
+				elseif play.mp < play.maxMP then //Heal MP
+					if itemData.PercentHeal then
+						play.mp = min(play.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+					else
+						play.mp = min(play.maxMP, $ + itemData.HealVal)
+					end
+					isHealed = true
+				end
+			end
+		end
+	elseif (itemType == ITEMT_ELIXER) or (itemType == ITEMT_ELIXER) then
+		if p.hp < p.maxHP then //Heal HP
+			if PercentHeal then
+				p.hp = min(p.maxHP, $ + ((itemData.HealVal * 100) / maxHP))
+			else
+				p.hp = min(p.maxHP, $ + itemData.HealVal)
+			end
+			isHealed = true
+		end
+		if itemType == ITEMT_GPOTION then
+			for play in players.iterate do
+				if play == p then continue end
+				if play.hp == 0 then continue end
+				if play.hp < play.maxHP then //Heal HP
+					play.hp = min(play.maxHP, $ + ((itemData.HealVal * 100) / maxHP))
+					isHealed = true
+				end
+			end
+		end
+		if p.mp == 0 then //Mana Recharge
+			p.mpRecharge = min(p.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+			if p.mpRecharge >= p.maxMP then //MP fully recharged
+				p.mp = p.maxMP
+				p.mpRecharge = 0
+			end
+			isHealed = true
+		elseif p.mp < p.maxMP then //Heal MP
+			p.mp = min(p.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+			isHealed = true
+		end
+		if itemType == ITEMT_GETHER then
+			for play in players.iterate do
+				if play == p then continue end
+				if play.hp == 0 then continue end
+				if play.mp == 0 then //Mana Recharge
+					play.mpRecharge = min(play.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+					if play.mpRecharge >= play.maxMP then //MP fully recharged
+						play.mp = play.maxMP
+						play.mpRecharge = 0
+					end
+					isHealed = true
+				elseif play.mp < play.maxMP then //Heal MP
+					play.mp = min(play.maxMP, $ + ((itemData.HealVal * 100) / maxMP))
+					isHealed = true
+				end
+			end
+		end
+	end
+	return isHealed
+end)

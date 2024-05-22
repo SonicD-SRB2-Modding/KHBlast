@@ -29,10 +29,13 @@ rawset (_G, "setupKHStuff", function(p)
 			lastMagic = 1,
 			cOption = 1,
 			comButton = false,
-			lastOption = 1,
+			lastOption = -1,
 			menuMode = 0,
 			xp = 0,
-			level = 1
+			level = 1,
+			str = 4,
+			mag = 4,
+			cList = {"", "", ""}
 		}
 		p.lives = 1
 		return true //Just set them up
@@ -79,7 +82,10 @@ addHook("ThinkFrame", function()
 			p.mp = data.StartingMP
 			p.maxMP = data.StartingMP
 			p.mpRecharge = 0
-			print(setupKHStuff(p))
+			p.mpTic = 50
+			setupKHStuff(p)
+			p.kh.str = data.StartingSTR
+			p.kh.mag = data.StartingMAG
 		end
 	end
 end)

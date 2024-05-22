@@ -24,6 +24,24 @@ for i = 1, 98
 end
 needEXP[99] = -1 //99 is max level
 
+local function changeDiff(newDiff)
+	if ultimatemode then nextKHBlastDiff = 5
+	elseif newDiff == "BEGINNER" or newDiff == "0" or newDiff == 0 then nextKHBlastDiff = 0
+	elseif newDiff == "STANDARD" or newDiff == "1" or newDiff == 1 then nextKHBlastDiff = 1
+	elseif newDiff == "PROUD" or newDiff == "2" or newDiff == 2 then nextKHBlastDiff = 2
+	elseif newDiff == "CRITICAL" or newDiff == "3" or newDiff == 3 then nextKHBlastDiff = 3
+	elseif newDiff == "EXP ZERO" or newDiff == "4" or newDiff == 4 then nextKHBlastDiff = 4
+	else
+		return false
+	end
+	khBlastDiff = nextKHBlastDiff
+	for player in players.iterate do
+		player.kh.diff = nextKHBlastDiff
+	end
+	//khBlastLuaBank[DIFFLUABANK] = khBlastDiff
+	return true
+end
+
 rawset(_G, "khBlastDiffTable", {
 	//Difficulty Text, Foe Damage Mod (2 = 100%), maxHP Mod (4 = 100%), description, expZero
 	[0] = {"Beginner", 1, 5, "\x83".."For casual players.\n\n".."\x80".."Damage recieved reduced by 50%\n\nMax HP increased by 25%\nFoe HP reduced by 25%", false},
