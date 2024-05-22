@@ -8,6 +8,49 @@ local SPELL_DEFENSE = 2 //Spells to protect - must have enough MP to cast
 local SPELL_SUPPORT = 3 //Spells to buff - must have enough MP to cast
 local SPELL_HEALING = 4 //Spells to heal or revive - often uses all MP
 
+local function aeroShieldUpdater(oldVal) //Returns new shield state, and if the shield was changed or not
+	local newVal = SH_WHIRLWIND //Default Value
+	local oldValStack = (oldVal & SH_STACK) //Extract any stackable shields (Fire Flower)
+	local oldValElse = (oldVal & SH_NOSTACK) //The other shields
+	if (oldValElse == SH_ARMAGEDDON) or (oldVarElse == SH_WHIRLWIND) or (oldVarElse == SH_ELEMENTAL) or (oldVarElse == SH_THUNDERCOIN) then
+		return oldVal, false //Do not change if Armageddon, Whirlwind, Elemental or Thundercoin is the shield type
+	elseif (oldVarElse == SH_FLAMEAURA) or (oldVarElse == SH_BUBBLEWRAP) then
+		newVal = SH_ELEMENTAL //Change Flame and Bubble to Elemental
+	elseif (oldVarElse == SH_ATTRACT) then
+		newVal = SH_THUNDERCOIN //Change Attract to Thundercoin
+	end
+	newVal = $ | oldValStack //Reapply the Fire Flower if needed
+	return newVal, true
+end
+
+local function cureChecker(p, baseCost, cost)
+	local modifier = cost
+	local othermod = (cost*4)/5
+	local doesheal = false
+	if p.hp < p.maxHP then
+		local healval = (p.maxHP * cost) / modifier
+		p.hp = min($ + healval, p.maxHP)
+		doesheal = true
+	end
+	for player in players.iterate do
+		if p == player then continue end
+		if P_AproxDistance(abs(p.mo.x - player.mo.x), abs(p.mo.y - player.mo.y)) <= 768*FRACUNIT then
+			if player.hp > 0 then
+				if player.hp < player.maxHP then
+					local healval = (player.maxHP * cost) / othermod
+					if p.kh and p.kh.mag then healval = $ + p.kh.mag end
+					player.hp = min($ + healval, player.maxHP)
+					S_StartSound(nil, sfx_kc42, p)
+					doesheal = true
+				end
+			else
+				//Revive
+			end
+		end
+	end
+	return doesheal
+end
+
 //Name, Cost, Cost Type, Spell Type, Function
 
 rawset(_G, "khSpellList", {
@@ -140,30 +183,7 @@ rawset(_G, "khSpellList", {
 			if p.mp == 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
-			local modifier = 200
-			local othermod = 160
-			local doesheal = false
-			if p.hp < p.maxHP then
-				local healval = (p.maxHP * cost) / modifier
-				p.hp = min($ + healval, p.maxHP)
-				doesheal = true
-			end
-			for player in players.iterate do
-				if p == player then continue end
-				if P_AproxDistance(abs(p.mo.x - player.mo.x), abs(p.mo.y - player.mo.y)) <= 768*FRACUNIT then
-					if player.hp > 0 then
-						if player.hp < player.maxHP then
-							local healval = (player.maxHP * cost) / othermod
-							if p.kh and p.kh.mag then healval = $ + p.kh.mag end
-							player.hp = min($ + healval, player.maxHP)
-							S_StartSound(nil, sfx_kc42, p)
-							doesheal = true
-						end
-					else
-						//Revive
-					end
-				end
-			end
+			local doesheal = cureChecker(p, 200, cost)
 			if doesheal then
 				p.mp = 0
 				S_StartSound(nil, sfx_kc42, player)
@@ -180,30 +200,7 @@ rawset(_G, "khSpellList", {
 			if p.mp == 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
-			local modifier = 100
-			local othermod = 80
-			local doesheal = false
-			if p.hp < p.maxHP then
-				local healval = (p.maxHP * cost) / modifier
-				p.hp = min($ + healval, p.maxHP)
-				doesheal = true
-			end
-			for player in players.iterate do
-				if p == player then continue end
-				if P_AproxDistance(abs(p.mo.x - player.mo.x), abs(p.mo.y - player.mo.y)) <= 768*FRACUNIT then
-					if player.hp > 0 then
-						if player.hp < player.maxHP then
-							local healval = (player.maxHP * cost) / othermod
-							if p.kh and p.kh.mag then healval = $ + p.kh.mag end
-							player.hp = min($ + healval, player.maxHP)
-							S_StartSound(nil, sfx_kc42, p)
-							doesheal = true
-						end
-					else
-						//Revive
-					end
-				end
-			end
+			local doesheal = cureChecker(p, 100, cost)
 			if doesheal then
 				p.mp = 0
 				S_StartSound(nil, sfx_kc42, player)
@@ -220,30 +217,7 @@ rawset(_G, "khSpellList", {
 			if p.mp == 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
-			local modifier = 50
-			local othermod = 40
-			local doesheal = false
-			if p.hp < p.maxHP then
-				local healval = (p.maxHP * cost) / modifier
-				p.hp = min($ + healval, p.maxHP)
-				doesheal = true
-			end
-			for player in players.iterate do
-				if p == player then continue end
-				if P_AproxDistance(abs(p.mo.x - player.mo.x), abs(p.mo.y - player.mo.y)) <= 768*FRACUNIT then
-					if player.hp > 0 then
-						if player.hp < player.maxHP then
-							local healval = (player.maxHP * cost) / othermod
-							if p.kh and p.kh.mag then healval = $ + p.kh.mag end
-							player.hp = min($ + healval, player.maxHP)
-							S_StartSound(nil, sfx_kc42, p)
-							doesheal = true
-						end
-					else
-						//Revive
-					end
-				end
-			end
+			local doesheal = cureChecker(p, 50, cost)
 			if doesheal then
 				p.mp = 0
 				S_StartSound(nil, sfx_kc42, player)
@@ -259,17 +233,13 @@ rawset(_G, "khSpellList", {
 		Func = function (p)
 			if p.mp < 35 then return false end
 			if ultimatemode then return false end
-			if (p.powers[pw_shield] == SH_WHIRLWIND) or (p.powers[pw_shield] == SH_THUNDERCOIN) then return false end
-			p.mp= $ - 35
-			if (p.powers[pw_shield] & SH_PROTECTELECTRIC) then
-				p.powers[pw_shield] = SH_THUNDERCOIN
-				S_StartSound(nil, sfx_s3k41, p)
-			else
-				p.powers[pw_shield] = SH_WHIRLWIND
-				S_StartSound(nil, sfx_shield, p)
+			local newShield, pass = aeroShieldUpdater(p.powers[pw_shield])
+			if pass then
+				p.powers[pw_shield] = newShield
+				P_SpawnShieldOrb(p)
+				p.mp = $ - 35
 			end
-			P_SpawnShieldOrb(p)
-			return true
+			return pass
 		end
 	},
 	["Haste"] = {
@@ -280,7 +250,7 @@ rawset(_G, "khSpellList", {
 		Func = function (p)
 			if p.mp < 40 then return false end
 			if p.powers[pw_sneakers] then return false end
-			p.mp= $ - 40
+			p.mp = $ - 40
 			p.powers[pw_sneakers] = TICRATE * 20
 			S_ChangeMusic("_shoes", false, p)
 			return true
@@ -292,6 +262,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_DRIVE,
 		Type = SPELL_SUPPORT,
 		Func = function (p)
+			if ultimatemode then return false end
 			if p.rings < 100 then return false end
 			p.rings = $ - 100
 			p.lives = $ + 1
