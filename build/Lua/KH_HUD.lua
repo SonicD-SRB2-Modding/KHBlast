@@ -1,17 +1,5 @@
 //Hud Stuff
 
-rawset(_G, "khheadpatch", setmetatable({
-	//Each character will have (up to) five HUD sprites, in this order:
-	//Normal, Low Health, KOed, Damaged, Super and Unique
-	//KCH_CHARA, KCL_CHARA, KCK_CHARA, KCD_CHARA, KCS_CHARA, KCU_CHARA
-	["sonic"] = {"KCH_SONIC", "KCL_SONIC"},
-	["tails"] = {"KCH_TAILS", "KCL_TAILS"},
-	["knuckles"] = {"KCH_KNUX", "KCL_KNUX"},
-	["amy"] = {"KCH_AMY", "KCL_AMY"},
-	["fang"] = {"KCH_FANG", "KCL_FANG"},
-	["metalsonic"] = {"KCH_METAL", "KCL_METAL"}
-}, {__index = function() return {"KH_BASE"} end}))
-
 local hpbarskin = {
 	[0] = SKINCOLOR_GREY,
 	[1] = SKINCOLOR_GREEN,
@@ -71,9 +59,13 @@ local function	drawMPBar(v, p, length, fillpercent, sx, sy, flags, party, rechar
 	local y = sy*FRACUNIT
 	if party then y = $ - (FRACUNIT/2) end
 	if fillpercent <= 0 then
-		v.drawStretched(sx*FRACUNIT, y, (length*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, lastcolormap)
+		v.drawStretched(sx*FRACUNIT, y, (length*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, chargecolormap)
 	else
-		v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
+		if recharge then
+			v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
+		else
+			v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
+		end
 		if fillpercent < length then
 			v.drawStretched((sx*FRACUNIT)-((fillpercent*FRACUNIT)/2), y, (length*(FRACUNIT/2))-(fillpercent*(FRACUNIT/2)), FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, lastcolormap)
 		end
@@ -474,11 +466,16 @@ local function drawPartyHPHUD(v, p, x, y)
 	if p.maxMP then
 		local mpBarLength = (p.maxMP / 2) + (p.maxMP % 2)
 		local mpBarPercent = max(p.mp / 2, 0) + (p.mp % 2)
+		local mpRecharge = false
+		if p.mp == 0 then
+			mpRecharge = true
+			mpBarPercent = max(p.mpRecharge / 2, 0) + (p.mpRecharge % 2)
+		end
 		if mpBarLength > 50 then
 			mpBarPercent = ($ * 50) / mpBarLength
 			mpBarLength = 50
 		end
-		drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true)
+		drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true, mpRecharge)
 	end
 end
 
@@ -537,11 +534,16 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 			if p.maxMP then
 				local mpBarLength = p.maxMP
 				local mpBarPercent = max(p.mp, 0)
+				local mpRecharge = false
+				if p.mp == 0 then
+					mpRecharge = true
+					mpBarPercent = max(p.mpRecharge, 0)
+				end
 				if mpBarLength > 100 then
 					mpBarPercent = ($ * 100) / mpBarLength
 					mpBarLength = 100
 				end
-				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false)
+				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false, mpBarPercent)
 			end
 			//Draw the player's Drive Bar
 			if not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) then drawKHDriveBar(v, p, x-31, y-8) end
@@ -570,7 +572,7 @@ local function drawKHXPBar (v, p, x, y)
 		levelxp = 1
 		xppercent = 100
 	end
-	if khBlastDiffTable[khBlastDiff][5] then 
+	if ultimatemode then 
 		xp = 0 
 		level = 1
 		toNextLevel = -1
@@ -580,7 +582,7 @@ local function drawKHXPBar (v, p, x, y)
 	
 	if not splitscreen then
 		v.drawStretched(((x+2)*FRACUNIT), (y+1)*FRACUNIT, (xppercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_CYAN))
-		if khBlastDiffTable[khBlastDiff][5] then
+		if ultimatemode then
 			v.drawStretched((x+2)*FRACUNIT, (y+1)*FRACUNIT, (100*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_CARBON))
 		else
 			v.drawStretched(((x+2)*FRACUNIT)+((xppercent*FRACUNIT)/2), (y+1)*FRACUNIT, ((100-xppercent)*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KXP_FIL"), playerhudflags, v.getColormap("sonic", SKINCOLOR_GREY))
@@ -599,7 +601,7 @@ local function drawKHXPBar (v, p, x, y)
 				end
 				v.drawString(x, y-6, ringsstring, playerhudflags, "small")
 				v.drawString(x+4, y+1, "\x82".."LV: ".."\x88"..tostring(level), playerhudflags, "small")
-			elseif (not khBlastDiffTable[khBlastDiff][5]) then
+			elseif (not ultimatemode) then
 				v.drawString(x, y-6, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(level)).."\x80 - ".."\x82".."XP: ".."\x88"..tostring(xp), playerhudflags, "small")
 				if level == 99 then
 					v.drawString(x+4, y+1, "\x82".."TNL: ".."\x88".."MAX", playerhudflags, "small")
@@ -623,7 +625,7 @@ local function drawKHXPBar (v, p, x, y)
 			end
 			v.drawString(x, y, ringsstring, playerhudflags, "small")
 			v.drawString(x, y+5, "\x82".."LV: ".."\x88"..tostring(level).."\x80 - "..xpPercentText, playerhudflags, "small")
-		elseif (not khBlastDiffTable[khBlastDiff][5]) then
+		elseif (not ultimatemode) then
 			v.drawString(x, y, "\x82".."LV: ".."\x88"..string.format("%02d",tostring(level)).."\x80 - ".."\x82".."XP: ".."\x88"..tostring(xp), playerhudflags, "small")
 			if level == 99 then
 				v.drawString(x, y+5, "\x82".."TNL: ".."\x88".."MAX", playerhudflags, "small")
@@ -706,6 +708,53 @@ local function drawCommandMenu(v, p, x, y)
 	end
 end
 
+local function drawDiffMenus(v, p)
+	local menuToDraw = v.cachePatch("KH_MU" .. tostring(p.difselmenu))
+	v.draw(160, 100, menuToDraw, V_HUDTRANS)
+	local menutext = "\x82" .. "Select Difficulty:"
+	local optiony = 82 + (18 * p.diffopt)
+	if p.difselmenu == 2 then 
+		menutext = "\x82" .. khBlastDifficulties[p.diffopt].name .. " Mode"
+		optiony = 154 - (18 * p.diffcon)
+	end
+	v.drawString(160, 45, menutext, V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+	local optionpatch = v.cachePatch("KH_MO" .. tostring(((p.realtime % 16) / 4) + 1))
+	v.draw(160, optiony, optionpatch, V_HUDTRANS)
+	if p.difselmenu == 1 then
+		local i
+		for i = 0, 4 do
+			local stringToDraw = khBlastDifficulties[i].name
+			if i >= 3 and (not (gamecomplete or khBlastcleargame or marathonmode)) then
+				stringToDraw = "\x86" .. $
+			elseif i == p.diffopt then
+				stringToDraw = "\x82" .. $
+			end
+			v.drawString(160, 68 + (18 * i), stringToDraw, V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+		end
+	elseif p.difselmenu == 2 then
+		local stringComfirm = "Yes"
+		local stringCancel = "No"
+		if ultimatemode then
+			stringComfirm = "Thou Must!"
+			stringCancel = "\x86".."No..."
+		end
+		if p.diffcon then
+			stringComfirm = "\x82" .. $
+		elseif not ultimatemode then
+			stringCancel = "\x82" .. $
+		end
+		
+		v.drawString(160, 124, stringComfirm, V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+		v.drawString(160, 142, stringCancel, V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+		v.drawString(90, 55, khBlastDifficulties[p.diffopt].description, V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+		v.drawString(90, 100, "Are you happy with this Difficulty?\n\nYou can ".."\x85".."NOT".."\x80".." change it later!", V_ALLOWLOWERCASE|V_HUDTRANS, "small")
+	end
+	v.drawString(160, 160, "Move Forward/Next Weapon: Up", V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+	v.drawString(160, 170, "Move Backwards/Prior Weapon: Down", V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+	v.drawString(160, 180, "Jump: Comfirm", V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+	v.drawString(160, 190, "Spin: Cancel", V_ALLOWLOWERCASE|V_HUDTRANS, "center")
+end
+
 hud.add(function(v, player)
 	if rawget(_G, "warioHUD") then
 		warioHUD = false
@@ -723,12 +772,27 @@ hud.add(function(v, player)
 	local showtext
 	showtext = true
 	
+	if (player.difsel == true) then
+		if (((not netgame) and (player == players[0])) or (netgame and ((player == server) or IsPlayerAdmin(player)))) then
+			drawDiffMenus(v, player)
+		elseif (not (splitscreen and player == secondarydisplayplayer)) and (not player.bot) then
+			if not netgame then
+				v.drawString(160, 87, players[0].name .. " is currently", nil, "center")
+			else
+				v.drawString(160, 87, server.name .. " is currently", nil, "center")
+			end
+			v.drawString(160, 96, "selecting the game difficulty", nil, "center")
+			v.drawString(160, 105, "Please wait...", nil, "center")
+		end
+		return
+	end
+	
 	for p in players.iterate
 		if p.spectator then continue end
 		if splitscreen then
 			if showtext then
-				v.drawString(240, 0, khBlastDiffTable[khBlastDiff][1].." Mode", V_SNAPTOTOP|V_HUDTRANSHALF,"small-right")
-				v.drawString(240, 100, khBlastDiffTable[khBlastDiff][1].." Mode", V_HUDTRANSHALF,"small-right")
+				v.drawString(240, 0, khBlastDifficulties[khBlastDiff].name.." Mode", V_SNAPTOTOP|V_HUDTRANSHALF,"small-right")
+				v.drawString(240, 100, khBlastDifficulties[khBlastDiff].name.." Mode", V_HUDTRANSHALF,"small-right")
 				showtext = false
 			end
 			if p == player and ((p == displayplayer) or (p == secondarydisplayplayer)) then
@@ -772,7 +836,7 @@ hud.add(function(v, player)
 			end
 		else
 			if showtext then
-				v.drawString(160, 0, khBlastDiffTable[khBlastDiff][1].." Mode", V_SNAPTOTOP|V_HUDTRANSHALF,"center")
+				v.drawString(160, 0, khBlastDifficulties[khBlastDiff].name.." Mode", V_SNAPTOTOP|V_HUDTRANSHALF,"center")
 				showtext = false
 			end
 			if not ((gametype == GT_COOP) or (p.bot) or (G_GametypeHasTeams() and p.ctfteam == player.ctfteam)) then continue end

@@ -13,8 +13,8 @@ local DEFAULTSETTINGS = {
 }
 
 -- Generate EXP table - Borrowed code from SRB2P to help with this
-local basexp = 20
-local totalxp = basexp
+local basexp = 25
+local totalxp = 10
 rawset(_G, "needEXP", {})
 
 needEXP[0] = 0
@@ -23,34 +23,6 @@ for i = 1, 98
 	totalxp = ($1 + (basexp*i)*38/100)
 end
 needEXP[99] = -1 //99 is max level
-
-local function changeDiff(newDiff)
-	if ultimatemode then nextKHBlastDiff = 5
-	elseif newDiff == "BEGINNER" or newDiff == "0" or newDiff == 0 then nextKHBlastDiff = 0
-	elseif newDiff == "STANDARD" or newDiff == "1" or newDiff == 1 then nextKHBlastDiff = 1
-	elseif newDiff == "PROUD" or newDiff == "2" or newDiff == 2 then nextKHBlastDiff = 2
-	elseif newDiff == "CRITICAL" or newDiff == "3" or newDiff == 3 then nextKHBlastDiff = 3
-	elseif newDiff == "EXP ZERO" or newDiff == "4" or newDiff == 4 then nextKHBlastDiff = 4
-	else
-		return false
-	end
-	khBlastDiff = nextKHBlastDiff
-	for player in players.iterate do
-		player.kh.diff = nextKHBlastDiff
-	end
-	//khBlastLuaBank[DIFFLUABANK] = khBlastDiff
-	return true
-end
-
-rawset(_G, "khBlastDiffTable", {
-	//Difficulty Text, Foe Damage Mod (2 = 100%), maxHP Mod (4 = 100%), description, expZero
-	[0] = {"Beginner", 1, 5, "\x83".."For casual players.\n\n".."\x80".."Damage recieved reduced by 50%\n\nMax HP increased by 25%\nFoe HP reduced by 25%", false},
-	[1] = {"Standard", 2, 4, "\x84".."For normal players.\n\n".."\x80".."Normal damage and Max HP.", false},
-	[2] = {"Proud", 3, 4, "\x82".."For advanced players.\n\n".."\x80".."Damage recieved increased by 50%\n\nMax HP unaltered.\nFoe HP increased by 50%", false},
-	[3] = {"Critical", 4, 3, "\x87".."For expert players.\n\n".."\x80".."Damage recieved is doubled.\n\nMax HP reduced by 25%\nFoe HP increased by 100%", false},
-	[4] = {"EXP Zero", 4, 3, "\x85".."For master players.\n\n".."\x80".."Damage recieved is doubled.\n\nMax HP reduced by 25%\nFoe HP increased by 100%\n".."\x85".."No EXP gains to HP or RP!", true},
-	[5] = {"ULTIMATE", 5, 2, "\x85".."DIFFICULTY LOCKED TO ULTIMATE.\n".."\x80".."Damage recieved increased to 250%\nMax HP reduced by 50%\nFoe HP increased by 100%\nNo Rings, No AutoLives, No Continues.\nCure, Aero and Revive disabled.\n".."\x85".."No EXP gains to HP or RP!", true}
-})
 
 rawset(_G, "characterData", setmetatable({
 	["sonic"] = {
@@ -87,3 +59,15 @@ rawset(_G, "characterData", setmetatable({
 		Spells = {} //Spell, Level Learned, Replaces this Spell
 	}
 }, {__index = function() return DEFAULTSETTINGS end}))
+
+rawset(_G, "khheadpatch", setmetatable({
+	//Each character will have (up to) five HUD sprites, in this order:
+	//Normal, Low Health, KOed, Damaged, Super and Unique
+	//KCH_CHARA, KCL_CHARA, KCK_CHARA, KCD_CHARA, KCS_CHARA, KCU_CHARA
+	["sonic"] = {"KCH_SONIC", "KCL_SONIC"},
+	["tails"] = {"KCH_TAILS", "KCL_TAILS"},
+	["knuckles"] = {"KCH_KNUX", "KCL_KNUX"},
+	["amy"] = {"KCH_AMY", "KCL_AMY"},
+	["fang"] = {"KCH_FANG", "KCL_FANG"},
+	["metalsonic"] = {"KCH_METAL", "KCL_METAL"}
+}, {__index = function() return {"KH_BASE"} end}))

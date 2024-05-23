@@ -274,3 +274,36 @@ rawset(_G, "khSpellList", {
 		end
 	}
 })
+
+rawset(_G, "getSpells", function(p)
+	if not p.mo and p.mo.valid return {} end
+	local skin = p.mo.skin
+	local skinData = characterData[skin]
+	local spellList = {}
+	local learnlist = skinData.Spells
+	local level = 1
+	if p.kh and p.kh.level then level = p.kh.level end
+	if #learnlist == 0 then return spellList end
+	for i = 1, #learnlist do
+		local spell = learnlist[i]
+		local spellLevel = spell[2]
+		if spellLevel > level then break end
+		//Add spell to spell list - overriding the spell named if it exists
+		local spellName = spell[1]
+		local spellToReplace = spell[3]
+		if not spellToReplace then
+			table.insert(spellList, spellName)
+		else
+			local replacedSpell = false
+			for j = 1, #spellList do
+				if spellList[j] == spellToReplace then
+					spellList[j] = spellName
+					replacedSpell = true
+					break
+				end
+			end
+			if not replacedSpell then table.insert(spellList, spellName) end
+		end
+	end
+	return spellList
+end)
