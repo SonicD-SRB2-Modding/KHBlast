@@ -58,11 +58,11 @@ local function	drawMPBar(v, p, length, fillpercent, sx, sy, flags, party, rechar
 	local chargecolormap = v.getColormap("sonic", SKINCOLOR_AQUA)
 	local y = sy*FRACUNIT
 	if party then y = $ - (FRACUNIT/2) end
-	if fillpercent <= 0 then
-		v.drawStretched(sx*FRACUNIT, y, (length*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, chargecolormap)
+	if fillpercent < 0 then
+		v.drawStretched(sx*FRACUNIT, y, (length*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, lastcolormap)
 	else
 		if recharge then
-			v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
+			v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, chargecolormap)
 		else
 			v.drawStretched(sx*FRACUNIT, y, (fillpercent*FRACUNIT)/2, FRACUNIT/2, v.cachePatch("KHP_BAR"), flags, colormap)
 		end
@@ -466,16 +466,16 @@ local function drawPartyHPHUD(v, p, x, y)
 	if p.maxMP then
 		local mpBarLength = (p.maxMP / 2) + (p.maxMP % 2)
 		local mpBarPercent = max(p.mp / 2, 0) + (p.mp % 2)
-		local mpRecharge = false
-		if p.mp == 0 then
-			mpRecharge = true
+		local recharging = false
+		if p.mp <= 0 then
+			recharging = true
 			mpBarPercent = max(p.mpRecharge / 2, 0) + (p.mpRecharge % 2)
 		end
 		if mpBarLength > 50 then
 			mpBarPercent = ($ * 50) / mpBarLength
 			mpBarLength = 50
 		end
-		drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true, mpRecharge)
+		drawMPBar(v, p, mpBarLength, mpBarPercent, x-29, y-6, playerhealthflags, true, recharging)
 	end
 end
 
@@ -534,16 +534,16 @@ local function drawKHHPHud(v, p, player, x, sy, playerone, playertwo, ally, spli
 			if p.maxMP then
 				local mpBarLength = p.maxMP
 				local mpBarPercent = max(p.mp, 0)
-				local mpRecharge = false
-				if p.mp == 0 then
-					mpRecharge = true
+				local recharging = false
+				if p.mp <= 0 then
+					recharging = true
 					mpBarPercent = max(p.mpRecharge, 0)
 				end
 				if mpBarLength > 100 then
 					mpBarPercent = ($ * 100) / mpBarLength
 					mpBarLength = 100
 				end
-				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false, mpBarPercent)
+				drawMPBar(v, p, mpBarLength, mpBarPercent, x-22, y+10, playerhealthflags, false, recharging)
 			end
 			//Draw the player's Drive Bar
 			if not (mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) then drawKHDriveBar(v, p, x-31, y-8) end
@@ -807,7 +807,7 @@ hud.add(function(v, player)
 					drawKHInfoBar(v, p, 320, py - 80)
 				end
 				if not ((mapheaderinfo[gamemap].typeoflevel & TOL_NIGHTS) or G_IsSpecialStage()) then
-					//drawCommandMenu(v, p, 2, py - 7)
+					drawCommandMenu(v, p, 2, py - 7)
 					local redtime = false
 					local time = p.realtime
 					if (gametyperules & GTR_TIMELIMIT) and (timelimit > 0) then

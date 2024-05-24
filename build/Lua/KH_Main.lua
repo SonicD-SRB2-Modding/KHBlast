@@ -22,6 +22,14 @@ addHook("ThinkFrame", function()
 				P_DoSuperTransformation(p, false)
 			end
 			p.rings = clientplayer.rings
+			if clientplayer.kh.xp > p.kh.xp then
+				p.kh.xp = clientplayer.kh.xp
+				if clientplayer.kh.level > p.kh.level then
+					local oldLevel = p.kh.level
+					p.kh.level = clientplayer.kh.level
+					updateStats(p, oldLevel, true)
+				end
+			end
 		end
 		
 		if p.kh.infotimer and (p.kh.infotimer > 0) then p.kh.infotimer = $ - 1 end
@@ -63,12 +71,12 @@ addHook("ThinkFrame", function()
 		end
 		
 		//Mana regen
-		if p.mp == 0 then
+		if p.mp <= 0 then
 			p.mpTic = $ - 12 //MP recharges 12x faster when in MP Recharge
 			if p.mpTic <= 0 then
 				p.mpTic = $ + 50
 				p.mpRecharge = $ + 1
-				if p.mpRecharge == p.maxMP then
+				if p.mpRecharge >= p.maxMP then
 					p.mp = p.maxMP
 					p.mpRecharge = 0
 					p.mpTic = 50

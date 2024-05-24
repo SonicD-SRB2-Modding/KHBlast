@@ -8,7 +8,7 @@ rawset(_G, "nextKHBlastDiff", 1)
 rawset(_G, "marathonDiff", 1)
 rawset(_G, "REVIVETIME", (TICRATE * 20))
 
-freeslot("sfx_cmdsel", "sfx_cmdbak", "sfx_cmderr")
+freeslot("sfx_cmdsel", "sfx_cmdbak", "sfx_cmderr", "sfx_lvlup")
 
 rawset(_G, "getEmeraldCount", function(flags)
 	local numEmeralds = 0
@@ -83,7 +83,25 @@ COM_AddCommand("changeKHDiffMarathon", function(player, newDiff)
 	end
 end, 1)
 
-COM_AddCommand("changeKHDiff", function(player, newDiff)
+local function changeDiff(newDiff)
+	if ultimatemode then nextKHBlastDiff = 5
+	elseif newDiff == "BEGINNER" or newDiff == "0" or newDiff == 0 then nextKHBlastDiff = 0
+	elseif newDiff == "STANDARD" or newDiff == "1" or newDiff == 1 then nextKHBlastDiff = 1
+	elseif newDiff == "PROUD" or newDiff == "2" or newDiff == 2 then nextKHBlastDiff = 2
+	elseif newDiff == "CRITICAL" or newDiff == "3" or newDiff == 3 then nextKHBlastDiff = 3
+	elseif newDiff == "EXP ZERO" or newDiff == "4" or newDiff == 4 then nextKHBlastDiff = 4
+	else
+		return false
+	end
+	khBlastDiff = nextKHBlastDiff
+	for player in players.iterate do
+		player.kh.diff = nextKHBlastDiff
+	end
+	//khBlastLuaBank[DIFFLUABANK] = khBlastDiff
+	return true
+end
+
+/*COM_AddCommand("changeKHDiff", function(player, newDiff)
 	if newDiff == nil
 		CONS_Printf(player, "This command allows you to change the difficulty level.")
 	elseif not (modeattacking or tutorialmode or marathonmode or ultimatemode) then
@@ -115,7 +133,7 @@ COM_AddCommand("changeKHDiff", function(player, newDiff)
 	else
 		CONS_Printf(player, "Hey! I never taught you to use this!")
 	end
-end, 1)
+end, 1)*/
 
 addHook("ThinkFrame", function()
 	//Temp deets for testing
@@ -136,24 +154,6 @@ addHook("ThinkFrame", function()
 		end
 	end
 end)
-
-local function changeDiff(newDiff)
-	if ultimatemode then nextKHBlastDiff = 5
-	elseif newDiff == "BEGINNER" or newDiff == "0" or newDiff == 0 then nextKHBlastDiff = 0
-	elseif newDiff == "STANDARD" or newDiff == "1" or newDiff == 1 then nextKHBlastDiff = 1
-	elseif newDiff == "PROUD" or newDiff == "2" or newDiff == 2 then nextKHBlastDiff = 2
-	elseif newDiff == "CRITICAL" or newDiff == "3" or newDiff == 3 then nextKHBlastDiff = 3
-	elseif newDiff == "EXP ZERO" or newDiff == "4" or newDiff == 4 then nextKHBlastDiff = 4
-	else
-		return false
-	end
-	khBlastDiff = nextKHBlastDiff
-	for player in players.iterate do
-		player.kh.diff = nextKHBlastDiff
-	end
-	//khBlastLuaBank[DIFFLUABANK] = khBlastDiff
-	return true
-end
 
 rawset(_G, "khBlastDifficulties", {
 	[0] = {

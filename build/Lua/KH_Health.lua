@@ -171,7 +171,6 @@ addHook("MapLoad", do
 		khBlastDiff = 1 //Always Standard outside of the campaign
 	else
 		//khBlastDiff = khBlastLuaBank[DIFFLUABANK]
-		khBlastDiff = 1
 	end
 	for p in players.iterate do
 		if gamemap <= 1000 then
@@ -289,6 +288,7 @@ local function xpAdd(p)
 			if p.kh.level == 99 then break end
 		end
 		updateStats(p, oldLevel)
+		S_StartSound(nil, sfx_lvlup, p) //Could have this check if the player has a custom level up sound, and play that instead
 	end
 	p.kh.xpToAdd = 0
 end
@@ -316,7 +316,7 @@ local function emeraldBoost(mo, touch)
 	end
 end
 
-addHook("ThinkFrame", function()
+addHook("PostThinkFrame", function()
 	for p in players.iterate do
 		if p.kh.xpToAdd > 0 then xpAdd(p) end
 	end
@@ -582,7 +582,9 @@ local function damageEnemy(mobj, source, attacker, nordam, damageType)
 		if attacker.player then
 			if (mobj.flags & MF_BOSS) then //Bosses
 				local p = attacker.player
-				if p.mp < p.maxMP then //Restore 2.5 MP per hit
+				if p.mp == 0 then
+				
+				elseif p.mp < p.maxMP then //Restore 2.5 MP per hit
 					p.mpTic = $ - 25
 					p.mp = min(p.maxMP, $ + 2)
 					if p.mpTic <= 0 then
@@ -598,7 +600,9 @@ local function damageEnemy(mobj, source, attacker, nordam, damageType)
 				P_GivePlayerRings(attacker.player, max(1, ((khFoeStats[mobj.type].baseATK)/2))) //Rings = Drive
 			elseif ultimatemode then
 				local p = attacker.player
-				if p.mp < p.maxMP then //Restore 2.5 MP per hit
+				if p.mp == 0 then
+					
+				elseif p.mp < p.maxMP then //Restore 2.5 MP per hit
 					p.mpTic = $ - 25
 					p.mp = min(p.maxMP, $ + 2)
 					if p.mpTic <= 0 then

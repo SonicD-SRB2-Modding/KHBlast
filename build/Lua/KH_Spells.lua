@@ -63,7 +63,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-		if p.mp == 0 then return false end
+		if p.mp <= 0 then return false end
 			local mobj = P_SpawnPlayerMissile(p.mo, MT_FIREBALL, MF2_EXPLOSION)
 			if not mobj then return false end //How the heck did that even happen...?
 			mobj.basedamage = 4
@@ -79,7 +79,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			local mobj = P_SpawnPlayerMissile(p.mo, MT_FIREBALL, MF2_EXPLOSION)
 			if not mobj then return false end //How the heck did that even happen...?
 			mobj.basedamage = 8
@@ -95,7 +95,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			local mobj = P_SpawnPlayerMissile(p.mo, MT_FIREBALL, MF2_EXPLOSION)
 			if not mobj then return false end //How the heck did that even happen...?
 			mobj.basedamage = 8
@@ -111,7 +111,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			p.mp  = max($ - 25, 0)
 			S_StartSound(nil, sfx_kc49, p)
 			P_RadiusAttack(p.mo, p.mo, 512*FRACUNIT, DMG_ELECTRIC)
@@ -124,7 +124,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			p.mp  = max($ - 25, 0)
 			S_StartSound(nil, sfx_kc49, p)
 			P_RadiusAttack(p.mo, p.mo, 768*FRACUNIT, DMG_ELECTRIC)
@@ -137,7 +137,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			p.mp  = max($ - 25, 0)
 			S_StartSound(nil, sfx_kc49, p)
 			P_RadiusAttack(p.mo, p.mo, 1024*FRACUNIT, DMG_ELECTRIC)
@@ -150,7 +150,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			//p.mp  = max($ - 20, 0)
 			return false //Not coded in yet
 		end
@@ -161,7 +161,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			//p.mp  = max($ - 20, 0)
 			return false //Not coded in yet
 		end
@@ -172,7 +172,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_OFFENSE,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			//p.mp  = max($ - 20, 0)
 			return false //Not coded in yet
 		end
@@ -183,7 +183,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_HEALING,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
 			local doesheal = cureChecker(p, 200, cost)
@@ -200,7 +200,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_HEALING,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
 			local doesheal = cureChecker(p, 100, cost)
@@ -217,7 +217,7 @@ rawset(_G, "khSpellList", {
 		CostType = TYPE_MP,
 		Type = SPELL_HEALING,
 		Func = function(p)
-			if p.mp == 0 then return false end
+			if p.mp <= 0 then return false end
 			if ultimatemode then return false end
 			local cost = p.mp
 			local doesheal = cureChecker(p, 50, cost)
@@ -283,6 +283,7 @@ rawset(_G, "getSpells", function(p)
 	local learnlist = skinData.Spells
 	local level = 1
 	if p.kh and p.kh.level then level = p.kh.level end
+	if ultimatemode then level = 25 end //Ultimate mode starts with spells up to Level 25
 	if #learnlist == 0 then return spellList end
 	for i = 1, #learnlist do
 		local spell = learnlist[i]
